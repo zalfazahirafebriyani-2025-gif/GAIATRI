@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>GAIATRI mobile · early warning</title>
+    <!-- Font Awesome 6 (free) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        body {
+            background: #dbe8f3;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 12px;
+        }
+
+        /* mobile frame */
+        .mobile-frame {
+            max-width: 390px;
+            width: 100%;
+            background: #f5faff;
+            border-radius: 42px;
+            box-shadow: 0 30px 60px -15px #1f4460b0;
+            overflow: hidden;
+            border: 1px solid #ffffff70;
+            backdrop-filter: blur(2px);
+            position: relative;
+        }
+
+        /* header with offline sync */
+        .mobile-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 24px 12px 24px;
+            background: white;
+            border-bottom: 1px solid #cde0ef;
+        }
+        .logo-small {
+            font-weight: 700;
+            font-size: 1.4rem;
+            color: #144d78;
+        }
+        .offline-badge {
+            background: #fee9b2;
+            border-radius: 60px;
+            padding: 6px 18px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #946f2a;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .offline-badge.online {
+            background: #c9efcf;
+            color: #2d7242;
+        }
+
+        /* alert banner */
+        .alert-banner-mobile {
+            background: #f57c32;
+            color: white;
+            padding: 16px 24px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            font-size: 1rem;
+            margin: 8px 16px 0 16px;
+            border-radius: 30px;
+            box-shadow: 0 8px 18px #dd773360;
+        }
+
+        /* location row */
+        .location-row {
+            padding: 20px 20px 8px 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #2b5f86;
+            font-weight: 500;
+        }
+
+        /* risk meter card */
+        .risk-card {
+            background: white;
+            margin: 8px 16px 16px 16px;
+            border-radius: 32px;
+            padding: 24px 20px;
+            border: 1px solid #cde2f5;
+            box-shadow: 0 8px 18px -10px #bed2e9;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .risk-text h2 {
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+        .risk-text .level {
+            color: #bf6516;
+            background: #fff0d4;
+            padding: 4px 18px;
+            border-radius: 60px;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+        .risk-gauge {
+            width: 70px; height: 70px;
+            background: conic-gradient(#f5b342 0deg 220deg, #e2e9f5 220deg 360deg);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 4px solid white;
+            box-shadow: 0 4px 12px #b2ceea;
+        }
+        .gauge-inner {
+            width: 52px; height: 52px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.4rem;
+            color: #b45f1a;
+        }
+
+        /* nearby nodes */
+        .section-title {
+            padding: 0 20px;
+            margin: 16px 0 8px 0;
+            font-weight: 700;
+            color: #1d4b72;
+        }
+        .node-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin: 0 16px;
+        }
+        .node-item {
+            background: white;
+            border-radius: 28px;
+            padding: 18px 20px;
+            border: 1px solid #cde0ef;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 5px 12px #dbe6f3;
+        }
+        .node-left .id {
+            font-weight: 700;
+            color: #103d5c;
+        }
+        .node-left .dist {
+            font-size: 0.8rem;
+            color: #5d7fa3;
+        }
+        .status-indicator {
+            width: 14px; height: 14px;
+            border-radius: 4px;
+            background: #3ba86d;
+        }
+        .status-indicator.warning { background: #f5b342; }
+        .status-indicator.alert { background: #f57c32; }
+
+        /* bottom tabs */
+        .bottom-tabs {
+            display: flex;
+            justify-content: space-around;
+            background: white;
+            border-top: 2px solid #cde0ef;
+            padding: 12px 16px 18px;
+            margin-top: 24px;
+        }
+        .tab-item {
+            text-align: center;
+            color: #477499;
+            font-size: 0.7rem;
+            font-weight: 500;
+        }
+        .tab-item i {
+            font-size: 1.5rem;
+            display: block;
+            margin-bottom: 4px;
+        }
+        .tab-item.active {
+            color: #1b5f8c;
+            font-weight: 700;
+        }
+
+        /* panels (home, map, warning, incident) – hanya satu aktif */
+        .panel {
+            display: none;
+        }
+        .panel.active-panel {
+            display: block;
+        }
+
+        /* mobile map simple (placeholder) */
+        .simple-map {
+            background: #c9deee;
+            border-radius: 38px;
+            margin: 16px;
+            height: 280px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-image: radial-gradient(circle at 30% 50%, #b3d1ed 10%, transparent 20%),
+                              radial-gradient(circle at 70% 30%, #fcda9f 15%, transparent 25%);
+            border: 2px solid white;
+            position: relative;
+        }
+        .map-marker {
+            background: #d64034;
+            width: 40px; height: 40px;
+            border-radius: 14px;
+            border: 3px solid white;
+            box-shadow: 0 4px 12px black;
+        }
+
+        /* bottom sheet (node detail) */
+        .bottom-sheet {
+            background: white;
+            border-radius: 40px 40px 0 0;
+            padding: 24px;
+            box-shadow: 0 -10px 30px #acc1db;
+            margin-top: 16px;
+            border-top: 2px solid #c1d7f0;
+        }
+
+        /* early warning ringkas */
+        .warning-summary {
+            background: #fcf4e2;
+            border-radius: 30px;
+            padding: 22px;
+            margin: 16px;
+        }
+        .suggested-action-mobile {
+            background: white;
+            border-radius: 28px;
+            padding: 16px;
+            margin: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .btn-ack {
+            background: #19638f;
+            color: white;
+            border: none;
+            border-radius: 60px;
+            padding: 16px 20px;
+            font-weight: 700;
+            width: 100%;
+            margin: 8px 16px;
+        }
+
+        /* incident log list */
+        .incident-item {
+            background: white;
+            border-radius: 24px;
+            padding: 16px;
+            margin: 8px 16px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        /* utility */
+        .text-small { color: #57799e; font-size:0.8rem; }
+        .mt-2 { margin-top: 8px; }
+        .d-flex { display: flex; }
+        .gap-2 { gap: 12px; }
+    </style>
+</head>
+<body>
+<div class="mobile-frame">
+    <!-- header with sync -->
+    <div class="mobile-header">
+        <div class="logo-small">GAIATRI</div>
+        <div class="offline-badge" id="offlineBadge"><i class="fa-regular fa-wifi-slash"></i> Offline mode</div>
+    </div>
+
+    <!-- ALERT BANNER (muncul jika ada critical) -->
+    <div class="alert-banner-mobile" id="alertBanner">
+        <i class="fa-regular fa-triangle-exclamation"></i> Critical risk · Shelter A
+    </div>
+
+    <!-- lokasi -->
+    <div class="location-row">
+        <i class="fa-regular fa-location-dot"></i> Shelter Zone A · last update 2 menit
+    </div>
+
+    <!-- panel navigasi dengan tabs -->
+    <!-- HOME PANEL (default) -->
+    <div id="homePanel" class="panel active-panel">
+        <!-- risk meter compact -->
+        <div class="risk-card">
+            <div class="risk-text">
+                <div class="level"><i class="fa-regular fa-circle-exclamation"></i> WATCH</div>
+                <h2>Env. risk 64</h2>
+            </div>
+            <div class="risk-gauge">
+                <div class="gauge-inner">64</div>
+            </div>
+        </div>
+
+        <!-- node terdekat -->
+        <div class="section-title"><i class="fa-regular fa-microchip"></i> Node terdekat</div>
+        <div class="node-list">
+            <div class="node-item">
+                <div class="node-left">
+                    <div class="id">G7A-21F <span class="dist">· 20m</span></div>
+                    <div class="text-small">Baterai 78% · GFET OK</div>
+                </div>
+                <div class="status-indicator"></div>
+            </div>
+            <div class="node-item">
+                <div class="node-left">
+                    <div class="id">G4B-12C <span class="dist">· 45m</span></div>
+                    <div class="text-small">Solar 82% · TiO₂ aktif</div>
+                </div>
+                <div class="status-indicator warning"></div>
+            </div>
+            <div class="node-item">
+                <div class="node-left">
+                    <div class="id">G2D-99K <span class="dist">· 80m</span></div>
+                    <div class="text-small">Sensor delay</div>
+                </div>
+                <div class="status-indicator alert"></div>
+            </div>
+        </div>
+
+        <!-- early warning ringkasan (mobile) -->
+        <div class="warning-summary">
+            <i class="fa-regular fa-brain"></i> <strong>AI:</strong> “High humidity + bioaerosol rise”
+            <div class="mt-2 text-small">Suggested: Ventilasi, masker</div>
+        </div>
+        <button class="btn-ack" onclick="alert('Acknowledge (dummy)')"><i class="fa-regular fa-check"></i> Acknowledge & simpan</button>
+
+        <!-- incident log mini -->
+        <div class="section-title">Incident terbaru</div>
+        <div class="incident-item">
+            <i class="fa-regular fa-clock" style="color:#b95e1a;"></i>
+            <div><strong>22 Feb 14:20</strong> Critical airborne</div>
+        </div>
+        <div class="incident-item">
+            <i class="fa-regular fa-clock" style="color:#f5b342;"></i>
+            <div><strong>22 Feb 09:10</strong> Alert water</div>
+        </div>
+    </div>
+
+    <!-- MAP PANEL (mobile) -->
+    <div id="mapPanel" class="panel">
+        <div class="location-row"><i class="fa-regular fa-map"></i> Peta risiko · tap node</div>
+        <div class="simple-map" id="simpleMap">
+            <div class="map-marker" style="transform: translate(-20px, -20px);"></div>
+            <div style="background:#f5b342; width:30px; height:30px; border-radius:10px; border:3px solid white; margin-left: 40px;"></div>
+        </div>
+        <!-- bottom sheet simulasi node detail -->
+        <div class="bottom-sheet">
+            <h3 style="color:#164d75;"><i class="fa-regular fa-microchip"></i> G7A-21F</h3>
+            <div class="d-flex gap-2">
+                <span class="risk-badge risk-critical" style="background:#faccb3; padding:4px 16px; border-radius:60px;">Critical 81</span>
+                <span class="text-small">update 2 menit</span>
+            </div>
+            <div style="display:flex; gap:16px; margin-top:20px;">
+                <button class="view-btn" style="background:#19638f; color:white; padding:14px; border-radius:40px; border:none; flex:1;" onclick="alert('Device detail')">View detail</button>
+                <button class="view-btn" style="background:#e2effa; padding:14px; border-radius:40px; border:none; flex:1;" onclick="alert('Report issue')">Report issue</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- EARLY WARNING PANEL (mobile) -->
+    <div id="warningPanel" class="panel">
+        <div class="risk-card" style="margin-top:16px;">
+            <div class="risk-text">
+                <div class="level">ALERT</div>
+                <h2>Risk 68</h2>
+            </div>
+            <div class="risk-gauge"><div class="gauge-inner">68</div></div>
+        </div>
+        <div class="warning-summary" style="background:#fffae7;">
+            <i class="fa-regular fa-message-exclamation"></i> “Humidity 89% + bioaerosol ↑48%”
+        </div>
+        <div class="suggested-action-mobile">
+            <span><i class="fa-regular fa-wind"></i> Ventilasi tenda</span> <span class="priority-high" style="background:#fde4cf; padding:4px 12px; border-radius:60px;">High</span>
+        </div>
+        <div class="suggested-action-mobile">
+            <span><i class="fa-regular fa-mask"></i> Distribusi masker</span> <span class="priority-high">High</span>
+        </div>
+        <div class="suggested-action-mobile">
+            <span><i class="fa-regular fa-droplet"></i> Cek sumber air</span> <span class="priority-medium" style="background:#fff3cf; padding:4px 12px; border-radius:60px;">Med</span>
+        </div>
+        <button class="btn-ack" onclick="alert('Disimpan offline')"><i class="fa-regular fa-floppy-disk"></i> Simpan untuk laporan</button>
+    </div>
+
+    <!-- INCIDENT LOG PANEL -->
+    <div id="incidentPanel" class="panel">
+        <div class="section-title" style="margin-top:16px;"><i class="fa-regular fa-clock-rotate-left"></i> Log kejadian</div>
+        <div class="incident-item">
+            <i class="fa-regular fa-circle" style="color:#d64034;"></i>
+            <div><strong>14:20</strong> Critical airborne · Zone A</div>
+            <span class="status-new" style="background:#cfe2ff; padding:4px 8px; border-radius:60px;">New</span>
+        </div>
+        <div class="incident-item">
+            <i class="fa-regular fa-circle" style="color:#f57c32;"></i>
+            <div><strong>09:10</strong> Alert water · Posko C</div>
+            <span class="status-reviewed">Reviewed</span>
+        </div>
+        <div class="incident-item">
+            <i class="fa-regular fa-circle" style="color:#f5b342;"></i>
+            <div><strong>21 Feb</strong> Watch soil · Zone B</div>
+            <span class="status-actioned">Actioned</span>
+        </div>
+        <div style="padding:16px;">
+            <button class="view-btn" style="background:#e2effa; width:100%; padding:16px; border-radius:60px;" onclick="alert('Tambah catatan offline')"><i class="fa-regular fa-pen"></i> Add field note (offline)</button>
+        </div>
+    </div>
+
+    <!-- bottom navigation -->
+    <div class="bottom-tabs">
+        <div class="tab-item active" data-panel="homePanel"><i class="fa-regular fa-house"></i> Home</div>
+        <div class="tab-item" data-panel="mapPanel"><i class="fa-regular fa-map"></i> Map</div>
+        <div class="tab-item" data-panel="warningPanel"><i class="fa-regular fa-bell"></i> Warning</div>
+        <div class="tab-item" data-panel="incidentPanel"><i class="fa-regular fa-clock"></i> Log</div>
+    </div>
+
+    <!-- offline sync indicator (fixed kecil) -->
+    <div style="display:flex; justify-content: center; padding: 8px; gap: 8px; background: #e8f2fc; font-size:0.7rem;">
+        <span><i class="fa-regular fa-hard-drive"></i> cached: risk, nodes, log</span>
+        <span id="syncStatus" class="offline-badge" style="padding:2px 12px;">🟡 offline</span>
+    </div>
+</div>
+
+<!-- simple script untuk tab navigasi, offline toggle dummy -->
+<script>
+    (function() {
+        const tabs = document.querySelectorAll('.tab-item');
+        const panels = {
+            homePanel: document.getElementById('homePanel'),
+            mapPanel: document.getElementById('mapPanel'),
+            warningPanel: document.getElementById('warningPanel'),
+            incidentPanel: document.getElementById('incidentPanel')
+        };
+
+        // fungsi ganti panel
+        function setActivePanel(panelId) {
+            Object.values(panels).forEach(p => p.classList.remove('active-panel'));
+            panels[panelId].classList.add('active-panel');
+            tabs.forEach(t => t.classList.remove('active'));
+            const activeTab = Array.from(tabs).find(t => t.dataset.panel === panelId);
+            if (activeTab) activeTab.classList.add('active');
+        }
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', (e) => {
+                const panelId = tab.dataset.panel;
+                if (panelId) setActivePanel(panelId);
+            });
+        });
+
+        // offline mode toggle dummy (klik ubah status)
+        const offlineBadge = document.getElementById('offlineBadge');
+        const syncStatus = document.getElementById('syncStatus');
+        offlineBadge.addEventListener('click', () => {
+            if (offlineBadge.innerText.includes('Offline')) {
+                offlineBadge.innerHTML = '<i class="fa-regular fa-wifi"></i> Online (sync)';
+                offlineBadge.classList.add('online');
+                syncStatus.innerHTML = '🟢 synced';
+            } else {
+                offlineBadge.innerHTML = '<i class="fa-regular fa-wifi-slash"></i> Offline mode';
+                offlineBadge.classList.remove('online');
+                syncStatus.innerHTML = '🟡 offline';
+            }
+        });
+
+        // alert banner klik dummy
+        document.getElementById('alertBanner').addEventListener('click', () => {
+            setActivePanel('warningPanel');
+        });
+
+        // set default home
+        setActivePanel('homePanel');
+
+        // simulate map tap node (buka bottom sheet)
+        const mapDiv = document.getElementById('simpleMap');
+        mapDiv.addEventListener('click', () => {
+            // scroll ke bottom sheet (sudah ada)
+        });
+    })();
+</script>
+
+<!-- dummy risk badge style inline -->
+<style>
+    .risk-badge { padding: 4px 12px; border-radius: 60px; font-weight: 600; font-size: 0.8rem; }
+    .status-new { background: #cfe2ff; color: #1e5b9c; border-radius: 60px; padding: 4px 12px; font-size:0.7rem; }
+    .status-reviewed { background: #e2eaf3; color: #4d6587; border-radius: 60px; padding: 4px 12px; }
+    .status-actioned { background: #c4e6d2; color: #1f6e4a; border-radius: 60px; padding: 4px 12px; }
+    .priority-high { background: #fde4cf; padding: 4px 12px; border-radius: 60px; }
+    .priority-medium { background: #fff3cf; padding: 4px 12px; border-radius: 60px; }
+    .btn-ack { background: #19638f; color: white; border: none; border-radius: 60px; padding: 16px 20px; font-weight: 700; margin: 8px 16px; width: calc(100% - 32px); }
+</style>
+</body>
+</html>

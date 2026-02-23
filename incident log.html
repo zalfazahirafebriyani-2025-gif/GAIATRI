@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GAIATRI · environmental incident log</title>
+    <!-- Font Awesome 6 (free) -->
+                 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        body {
+            background: #e9f0f7;
+            padding: 24px;
+            min-height: 100vh;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+        }
+
+        .incident-container {
+            max-width: 1400px;
+            width: 100%;
+            background: white;
+            border-radius: 48px;
+            box-shadow: 0 40px 80px -20px #1f446080;
+            overflow: hidden;
+            padding: 28px 32px 40px 32px;
+        }
+
+        /* header */
+        .page-header {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 32px;
+        }
+        .page-header h1 {
+            font-size: 2.2rem;
+            font-weight: 600;
+            color: #144673;
+            letter-spacing: -0.5px;
+        }
+        .sub-header {
+            color: #57799e;
+            margin-top: 4px;
+        }
+        .filter-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            background: #f2f8fe;
+            border-radius: 64px;
+            padding: 8px 20px;
+            border: 1px solid #cfe1f2;
+            align-items: center;
+        }
+        .filter-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: white;
+            border-radius: 40px;
+            padding: 6px 18px;
+            border: 1px solid #c0d8ee;
+        }
+        .filter-item i {
+            color: #3d709b;
+        }
+        .filter-item select {
+            border: none;
+            background: transparent;
+            font-weight: 500;
+            color: #15415e;
+            outline: none;
+        }
+
+        /* view toggle */
+        .view-toggle {
+            display: flex;
+            gap: 8px;
+            background: #e5f0fa;
+            border-radius: 40px;
+            padding: 4px;
+        }
+        .view-btn {
+            background: transparent;
+            border: none;
+            padding: 10px 26px;
+            border-radius: 40px;
+            font-weight: 600;
+            color: #256391;
+            cursor: pointer;
+        }
+        .view-btn.active {
+            background: white;
+            box-shadow: 0 6px 12px #c0d5ed;
+            color: #0f3f62;
+        }
+
+        /* table / list */
+        .incident-list {
+            margin-top: 24px;
+            border-radius: 28px;
+            border: 1px solid #d2e4f5;
+            overflow: hidden;
+        }
+        .incident-row {
+            display: grid;
+            grid-template-columns: 1.2fr 1.2fr 1fr 1.2fr 1.2fr 1fr 0.5fr;
+            align-items: center;
+            padding: 18px 24px;
+            background: white;
+            border-bottom: 1px solid #ddeaf7;
+            cursor: pointer;
+            transition: 0.1s;
+        }
+        .incident-row:hover {
+            background: #f2faff;
+        }
+        .incident-header {
+            background: #e3f0fa;
+            font-weight: 700;
+            color: #154d78;
+            border-bottom: 2px solid #bad2ed;
+            cursor: default;
+        }
+        .risk-badge {
+            background: #f2d9c2;
+            border-radius: 60px;
+            padding: 4px 16px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            width: fit-content;
+        }
+        .risk-critical { background: #faccb3; color: #b3411f; }
+        .risk-alert { background: #fbe4b3; color: #b46916; }
+        .risk-watch { background: #fbeea4; color: #8b701c; }
+        .risk-safe { background: #c8e6cf; color: #2a7543; }
+        .status-new { background: #cfe2ff; color: #1e5b9c; border-radius: 60px; padding: 4px 12px; font-size:0.8rem; font-weight:600; display:inline-block; }
+        .status-reviewed { background: #e2eaf3; color: #4d6587; }
+        .status-actioned { background: #c4e6d2; color: #1f6e4a; }
+
+        /* detail drawer (hidden by default) */
+        .detail-drawer {
+            background: #f7fcff;
+            border-radius: 40px;
+            margin-top: 30px;
+            padding: 28px 32px;
+            border: 2px solid #c7dcf2;
+            box-shadow: 0 20px 30px -10px #aac4e2;
+            display: none;
+        }
+        .drawer-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 24px;
+        }
+        .drawer-close {
+            background: #e1effb;
+            border: none;
+            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+            font-size: 1.5rem;
+            color: #254f7a;
+            cursor: pointer;
+        }
+        .detail-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 28px;
+        }
+        .signal-box {
+            background: white;
+            border-radius: 28px;
+            padding: 20px;
+            border: 1px solid #cde0f0;
+        }
+        .spark-line {
+            display: flex;
+            align-items: end;
+            gap: 8px;
+            height: 60px;
+            margin: 16px 0;
+        }
+        .spark-bar {
+            width: 16px;
+            background: #4994c5;
+            border-radius: 8px;
+        }
+        .ai-chip {
+            background: #fff6d9;
+            border-radius: 40px;
+            padding: 14px 20px;
+            border-left: 6px solid #f7b731;
+            margin: 16px 0;
+        }
+        .action-checklist {
+            background: #f0f6fd;
+            border-radius: 28px;
+            padding: 18px;
+        }
+        .check-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 10px 0;
+            border-bottom: 1px solid #cde0ef;
+        }
+        .log-field {
+            background: white;
+            border-radius: 24px;
+            padding: 16px;
+            margin-top: 20px;
+        }
+
+        /* timeline alternative */
+        .timeline-view {
+            display: none;
+            margin-top: 30px;
+        }
+        .timeline-item {
+            display: flex;
+            gap: 24px;
+            padding: 16px 0;
+            border-left: 4px solid;
+            padding-left: 24px;
+            margin-left: 20px;
+        }
+
+        /* export modal */
+        .export-modal {
+            display: none;
+            position: fixed;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border-radius: 56px;
+            padding: 32px 42px;
+            box-shadow: 0 40px 90px #1f3d5e;
+            z-index: 999;
+            max-width: 500px;
+            width: 90%;
+        }
+        .modal-backdrop {
+            display: none;
+            position: fixed;
+            top:0; left:0; width:100%; height:100%;
+            background: #00000060;
+            backdrop-filter: blur(3px);
+            z-index: 998;
+        }
+        .export-options {
+            display: flex;
+            gap: 24px;
+            justify-content: center;
+            margin: 36px 0 20px;
+        }
+        .export-btn {
+            background: #e3effa;
+            border: none;
+            padding: 18px 36px;
+            border-radius: 60px;
+            font-weight: 700;
+            color: #1d5f91;
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+
+        /* role badge */
+        .role-hint {
+            background: #dfecf7;
+            border-radius: 60px;
+            padding: 4px 20px;
+            font-size: 0.8rem;
+            display: inline-block;
+        }
+
+        /* responsive */
+        @media (max-width: 1000px) {
+            .incident-row { grid-template-columns: 1fr 1fr 1fr 1fr 1fr; gap: 6px; }
+            .incident-header { display: none; }
+        }
+        .kembali:hover{
+            background-color: #2674ab !important;
+        }
+    </style>
+</head>
+<body>
+<div class="incident-container">
+    <!-- header + filter -->
+    <a class="kembali text-decoration-none fw-bold btn rounded-3 px-3 text-light" style="background-color: #0f3f62;" href="index.html"><div>Back</div></a>
+
+    <div class="page-header">
+        <div>
+            <h1>Environmental Incident Log</h1>
+            <div class="sub-header"><i class="fa-regular fa-clipboard"></i> Recorded environmental risk events & response actions</div>
+        </div>
+        <div class="filter-bar">
+            <div class="filter-item"><i class="fa-regular fa-calendar"></i> <select><option>24h</option><option>7d</option><option>30d</option></select></div>
+            <div class="filter-item"><i class="fa-regular fa-triangle-exclamation"></i> <select><option>All risks</option><option>Critical</option><option>Alert</option></select></div>
+            <div class="filter-item"><i class="fa-regular fa-location-dot"></i> <select><option>All zones</option><option>Zone A</option><option>Zone B</option></select></div>
+        </div>
+    </div>
+
+    <!-- view toggle + export -->
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <div class="view-toggle">
+            <button class="view-btn active" id="viewListBtn"><i class="fa-regular fa-list"></i> List</button>
+            <button class="view-btn" id="viewTimelineBtn"><i class="fa-regular fa-timeline"></i> Timeline</button>
+        </div>
+        <div>
+            <span class="role-hint"><i class="fa-regular fa-user"></i> Admin wilayah · lihat semua</span>
+            <button class="view-btn" id="exportBtn" style="margin-left:20px; background:#1b5983; color:white;"><i class="fa-regular fa-download"></i> Export</button>
+        </div>
+    </div>
+
+    <!-- INCIDENT LIST VIEW (default) -->
+    <div id="listView" class="incident-list">
+        <div class="incident-row incident-header">
+            <div>Timestamp</div> <div>Location</div> <div>Risk category</div> <div>Risk level</div> <div>Trigger</div> <div>Status</div> <div></div>
+        </div>
+        <div class="incident-row" data-id="inc001">
+            <div>22 Feb 2026, 14:20</div> <div>Shelter Zone A</div> <div>Airborne</div> <div><span class="risk-badge risk-critical">Critical</span></div> <div>Edge AI</div> <div><span class="status-new">New</span></div> <div><i class="fa-regular fa-arrow-right"></i></div>
+        </div>
+        <div class="incident-row" data-id="inc002">
+            <div>22 Feb 2026, 09:10</div> <div>Posko C (hilir)</div> <div>Waterborne</div> <div><span class="risk-badge risk-alert">Alert</span></div> <div>Manual review</div> <div><span class="status-reviewed">Reviewed</span></div> <div><i class="fa-regular fa-arrow-right"></i></div>
+        </div>
+        <div class="incident-row" data-id="inc003">
+            <div>21 Feb 2026, 22:05</div> <div>Zone B (genangan)</div> <div>Soil</div> <div><span class="risk-badge risk-watch">Watch</span></div> <div>Edge AI</div> <div><span class="status-actioned">Actioned</span></div> <div><i class="fa-regular fa-arrow-right"></i></div>
+        </div>
+        <div class="incident-row" data-id="inc004">
+            <div>20 Feb 2026, 11:30</div> <div>Shelter Zone D</div> <div>Airborne</div> <div><span class="risk-badge risk-alert">Alert</span></div> <div>Edge AI</div> <div><span class="status-new">New</span></div> <div><i class="fa-regular fa-arrow-right"></i></div>
+        </div>
+        <div class="incident-row" data-id="inc005">
+            <div>19 Feb 2026, 16:45</div> <div>Puskesmas darurat</div> <div>Waterborne</div> <div><span class="risk-badge risk-critical">Critical</span></div> <div>Manual</div> <div><span class="status-actioned">Actioned</span></div> <div><i class="fa-regular fa-arrow-right"></i></div>
+        </div>
+    </div>
+
+    <!-- TIMELINE VIEW (alternatif) -->
+    <div id="timelineView" class="timeline-view">
+        <div style="background:#f4faff; border-radius:36px; padding:32px;">
+            <h3 style="color:#194f78;"><i class="fa-regular fa-timeline"></i> Incident timeline (vertical)</h3>
+            <div class="timeline-item" style="border-color:#d64034;">
+                <div>22 Feb 14:20</div> <div><strong>Critical</strong> airborne · Zone A</div>
+            </div>
+            <div class="timeline-item" style="border-color:#f57c32;">
+                <div>22 Feb 09:10</div> <div>Alert water · Posko C</div>
+            </div>
+            <div class="timeline-item" style="border-color:#f5b342;">
+                <div>21 Feb 22:05</div> <div>Watch soil · Zone B</div>
+            </div>
+            <div class="timeline-item" style="border-color:#f57c32;">
+                <div>20 Feb 11:30</div> <div>Alert airborne · Shelter D</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- DETAIL DRAWER (akan tampil saat row diklik) -->
+    <div id="detailDrawer" class="detail-drawer">
+        <div class="drawer-header">
+            <h2 style="color:#164e7a;"><i class="fa-regular fa-circle-info"></i> Incident detail · <span id="detailId">INC001</span></h2>
+            <button class="drawer-close" id="closeDrawer"><i class="fa-regular fa-xmark"></i></button>
+        </div>
+        <div class="detail-grid">
+            <div>
+                <div class="signal-box">
+                    <div><strong>📍 Location:</strong> Shelter Zone A</div>
+                    <div><strong>🕒 Detected:</strong> 22 Feb 2026, 14:20</div>
+                    <div><strong>📟 Node ID:</strong> G7A-21F</div>
+                    <div><strong>📊 Risk index:</strong> 81 (Critical)</div>
+                    <div class="spark-line">
+                        <div class="spark-bar" style="height:48px;"></div><div style="height:64px;" class="spark-bar"></div><div style="height:72px;" class="spark-bar"></div><div style="height:68px;" class="spark-bar"></div><div style="height:80px;" class="spark-bar"></div>
+                    </div>
+                    <div><i class="fa-regular fa-chart-line"></i> Spike beyond baseline (bioaerosol +63%)</div>
+                </div>
+                <div class="ai-chip">
+                    <i class="fa-regular fa-brain"></i> <strong>AI insight (historical):</strong> “Pattern resembles previous respiratory risk events in flood-affected shelters.” <span class="role-hint" style="background:#e3b87c;">Confidence: High</span>
+                </div>
+            </div>
+            <div>
+                <div class="action-checklist">
+                    <h4><i class="fa-regular fa-list-check"></i> Suggested response (at that time)</h4>
+                    <div class="check-item"><i class="fa-regular fa-square-check" style="color:#2f7d52;"></i> Increase ventilation in shelter tents</div>
+                    <div class="check-item"><i class="fa-regular fa-square-check" style="color:#2f7d52;"></i> Distribute masks to high-risk groups</div>
+                    <div class="check-item"><i class="fa-regular fa-square"></i> Inspect water sources</div>
+                </div>
+                <div class="log-field">
+                    <h4>🧾 Action taken (user input)</h4>
+                    <div><strong>Selected:</strong> Ventilation + masks</div>
+                    <div><strong>Notes:</strong> Dilakukan pukul 15:00, petugas lapangan.</div>
+                    <div><strong>Status:</strong> <span class="status-actioned">✔ Actioned</span></div>
+                </div>
+                <div style="margin-top:20px; display:flex; gap:12px;">
+                    <button class="view-btn" style="background:#226191; color:white;" onclick="alert('Update status dummy')">Mark as reviewed</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- EXPORT MODAL (dummy) -->
+    <div class="modal-backdrop" id="modalBackdrop"></div>
+    <div class="export-modal" id="exportModal">
+        <h2 style="color:#14456b;">📤 Export Incident Report</h2>
+        <div class="export-options">
+            <button class="export-btn" onclick="alert('PDF export dummy')">PDF</button>
+            <button class="export-btn" onclick="alert('CSV export dummy')">CSV</button>
+        </div>
+        <p style="color:#51799e; text-align:center;">Ringkasan kejadian, grafik risiko, respons yang diambil.</p>
+        <p style="font-size:0.8rem; text-align:center;">Generated from GAIATRI Environmental Monitoring System</p>
+        <button id="closeModal" style="margin-top:24px; width:100%; background:#eaf2fa; border:none; padding:16px; border-radius:60px;">Close</button>
+    </div>
+
+    <!-- role hint -->
+    <div style="display:flex; justify-content:space-between; margin-top:24px; color:#517292;">
+        <span><i class="fa-regular fa-eye"></i> Admin: lihat semua, edit status</span>
+        <span><i class="fa-regular fa-user"></i> Petugas: lihat area sendiri, tambah catatan</span>
+        <span><i class="fa-regular fa-lock"></i> Viewer publik: summary anonim</span>
+    </div>
+</div>
+
+<script>
+    (function() {
+        // elements
+        const listView = document.getElementById('listView');
+        const timelineView = document.getElementById('timelineView');
+        const viewListBtn = document.getElementById('viewListBtn');
+        const viewTimelineBtn = document.getElementById('viewTimelineBtn');
+        const detailDrawer = document.getElementById('detailDrawer');
+        const closeDrawer = document.getElementById('closeDrawer');
+        const exportBtn = document.getElementById('exportBtn');
+        const exportModal = document.getElementById('exportModal');
+        const modalBackdrop = document.getElementById('modalBackdrop');
+        const closeModal = document.getElementById('closeModal');
+
+        // toggle list/timeline
+        viewListBtn.addEventListener('click', () => {
+            viewListBtn.classList.add('active');
+            viewTimelineBtn.classList.remove('active');
+            listView.style.display = 'block';
+            timelineView.style.display = 'none';
+        });
+        viewTimelineBtn.addEventListener('click', () => {
+            viewTimelineBtn.classList.add('active');
+            viewListBtn.classList.remove('active');
+            timelineView.style.display = 'block';
+            listView.style.display = 'none';
+        });
+
+        // row click -> show drawer
+        const rows = document.querySelectorAll('.incident-row[data-id]');
+        rows.forEach(row => {
+            row.addEventListener('click', (e) => {
+                const id = row.getAttribute('data-id');
+                document.getElementById('detailId').innerText = id.toUpperCase();
+                // ubah sedikit konten drawer sesuai id (dummy)
+                const locationMap = {
+                    inc001: 'Shelter Zone A', inc002: 'Posko C', inc003: 'Zone B', inc004: 'Shelter D', inc005: 'Puskesmas'
+                };
+                const loc = locationMap[id] || 'unknown';
+                detailDrawer.style.display = 'block';
+                // scroll into view
+                detailDrawer.scrollIntoView({ behavior: 'smooth' });
+            });
+        });
+
+        // close drawer
+        closeDrawer.addEventListener('click', () => {
+            detailDrawer.style.display = 'none';
+        });
+
+        // export modal
+        exportBtn.addEventListener('click', () => {
+            exportModal.style.display = 'block';
+            modalBackdrop.style.display = 'block';
+        });
+        function closeExport() {
+            exportModal.style.display = 'none';
+            modalBackdrop.style.display = 'none';
+        }
+        closeModal.addEventListener('click', closeExport);
+        modalBackdrop.addEventListener('click', closeExport);
+
+        // filter dummy (tidak ada fungsi, hanya UI)
+        document.querySelectorAll('.filter-item select').forEach(s => {
+            s.addEventListener('change', () => alert('Filter updated (dummy)'));
+        });
+
+        // initial
+        listView.style.display = 'block';
+        timelineView.style.display = 'none';
+    })();
+</script>
+</body>
+</html>

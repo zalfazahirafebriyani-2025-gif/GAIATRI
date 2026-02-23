@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GAIATRI · environmental risk analytics</title>
+    <!-- Font Awesome 6 (free) & Chart.js 3 (lightweight) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        body {
+            background: #f2f6fb; /* soft biru-abu */
+            padding: 24px;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+        }
+
+        .analytics-container {
+            max-width: 1440px;
+            width: 100%;
+            background: white;
+            border-radius: 40px;
+            box-shadow: 0 30px 60px -20px #1b3e5e40;
+            overflow: hidden;
+            padding: 28px 32px 40px 32px;
+        }
+
+        /* header */
+        .page-header {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 30px;
+        }
+        .page-header h1 {
+            font-size: 2rem;
+            font-weight: 600;
+            color: #15435f;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .filter-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px 20px;
+            background: #f0f7fd;
+            padding: 16px 24px;
+            border-radius: 60px;
+            border: 1px solid #cbe0f2;
+        }
+        .filter-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .filter-item label {
+            font-weight: 500;
+            color: #2d5b82;
+        }
+        .filter-item select {
+            background: white;
+            border: 1px solid #bcd3ec;
+            border-radius: 40px;
+            padding: 8px 20px;
+            font-weight: 500;
+            color: #143d5e;
+            outline: none;
+            cursor: pointer;
+        }
+        .badge {
+            background: #e3effb;
+            padding: 6px 14px;
+            border-radius: 40px;
+            font-size: 0.9rem;
+            color: #1e5580;
+        }
+
+        /* core grid 2 kolom */
+        .row-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+            margin-bottom: 30px;
+        }
+        .chart-card {
+            background: #ffffff;
+            border: 1px solid #e0edf9;
+            border-radius: 32px;
+            padding: 22px 22px 18px 22px;
+            box-shadow: 0 10px 24px -12px #c5d9ef;
+            transition: 0.2s;
+        }
+        .chart-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            color: #1a4d76;
+            margin-bottom: 14px;
+            font-size: 1.2rem;
+        }
+        .tooltip-icon {
+            color: #769fc5;
+            font-size: 0.9rem;
+            cursor: help;
+            border-bottom: 1px dashed #a2bedd;
+        }
+        .insight-note {
+            background: #f5faff;
+            border-radius: 20px;
+            padding: 12px 18px;
+            margin-top: 16px;
+            font-size: 0.95rem;
+            color: #2b557a;
+            border-left: 4px solid #f7b731;
+        }
+        canvas {
+            max-height: 200px;
+            width: 100% !important;
+        }
+
+        /* soil & ai prediksi gabung satu grid */
+        .soil-ai-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 30px;
+        }
+        .soil-card, .ai-card {
+            background: white;
+            border: 1px solid #e0edf9;
+            border-radius: 32px;
+            padding: 22px;
+        }
+        .parameter-strip {
+            display: flex;
+            justify-content: space-between;
+            background: #f2f9ff;
+            border-radius: 60px;
+            padding: 12px 24px;
+            margin: 16px 0;
+        }
+        .param-item {
+            text-align: center;
+        }
+        .param-label {
+            font-size: 0.8rem;
+            color: #557ca5;
+        }
+        .param-value {
+            font-weight: 700;
+            font-size: 1.3rem;
+        }
+        .badge-risk {
+            background: #f0dbb0;
+            padding: 4px 16px;
+            border-radius: 60px;
+            font-weight: 600;
+            color: #a8590e;
+            display: inline-block;
+        }
+
+        /* AI projection gauges */
+        .gauge-group {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            margin: 20px 0 16px;
+        }
+        .gauge {
+            text-align: center;
+            width: 90px;
+        }
+        .gauge .circle {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: conic-gradient(#f4b836 0deg calc(0.6*360deg), #dde5f0 calc(0.6*360deg) 360deg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 8px;
+        }
+        .gauge .inner {
+            width: 54px;
+            height: 54px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: #1e3f5c;
+        }
+        .cat-label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #1f5278;
+        }
+
+        /* insight box */
+        .ai-insight-box {
+            background: #ddeeff;
+            border-radius: 28px;
+            padding: 22px 28px;
+            margin: 20px 0 30px;
+            border-left: 10px solid #eab130;
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: #08446e;
+            box-shadow: 0 10px 20px -12px #c5d9f0;
+        }
+
+        /* zone table */
+        .zone-table {
+            background: white;
+            border-radius: 32px;
+            border: 1px solid #d2e6fb;
+            overflow: hidden;
+            margin-top: 20px;
+        }
+        .zone-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1.5fr 0.5fr;
+            align-items: center;
+            padding: 18px 24px;
+            border-bottom: 1px solid #e2eefa;
+            cursor: pointer;
+            transition: 0.1s;
+        }
+        .zone-row:hover {
+            background: #f0f9ff;
+        }
+        .zone-header {
+            background: #e3f0fa;
+            font-weight: 600;
+            color: #124267;
+            border-bottom: 2px solid #bad2ed;
+        }
+        .trend-up { color: #d35400; font-weight: 600; }
+        .trend-down { color: #2e7d32; }
+        .trend-steady { color: #607d8b; }
+        .alert-badge {
+            background: #fddfc2;
+            color: #b3531b;
+            border-radius: 40px;
+            padding: 4px 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        /* setting panel */
+        .settings-panel {
+            background: #f3fafe;
+            border-radius: 32px;
+            padding: 18px 28px;
+            margin-top: 30px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 32px;
+            border: 1px solid #d1e1f2;
+        }
+        .toggle-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .toggle-item input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            accent-color: #1e6b9e;
+        }
+
+        /* footer */
+        .footnote {
+            margin-top: 24px;
+            color: #6f94b6;
+            font-size: 0.8rem;
+            display: flex;
+            justify-content: flex-end;
+            gap: 24px;
+        }
+
+        /* responsif */
+        @media (max-width: 1000px) {
+            .row-grid { grid-template-columns: 1fr; }
+            .soil-ai-row { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 600px) {
+            .analytics-container { padding: 16px; }
+            .filter-group { flex-direction: column; width: 100%; }
+            .zone-row { grid-template-columns: 1fr 1fr 1fr; gap: 6px; }
+        }
+
+        /* utility */
+        .text-small { color: #6b93b7; }
+        hr { border: 1px solid #ddeeff; margin: 24px 0; }
+        .kembali:hover{
+            background-color: #2674ab !important;
+        }
+    </style>
+</head>
+<body>
+<div class="analytics-container">
+    <!-- HEADER + FILTER -->
+    <a class="kembali text-decoration-none fw-bold btn rounded-3 px-3 text-light" style="background-color: #0f3f62;" href="index.html"><div>Back</div></a>
+    <div class="page-header">
+        <h1 class="text-center mx-auto"><i class="fa-regular fa-chart-line" style="color:#1e6a9b;"></i> Environmental Risk Analytics</h1>
+        <div class="filter-group">
+            <div class="filter-item">
+                <label><i class="fa-regular fa-calendar"></i> Waktu</label>
+                <select id="timeFilter">
+                    <option value="24h" selected>24 jam</option>
+                    <option value="7d">7 hari</option>
+                    <option value="30d">30 hari</option>
+                </select>
+            </div>
+            <div class="filter-item">
+                <label><i class="fa-regular fa-location-dot"></i> Zona</label>
+                <select id="zoneFilter">
+                    <option value="all" selected>Semua zona</option>
+                    <option value="zonaA">Shelter A</option>
+                    <option value="zonaB">Shelter B</option>
+                    <option value="zonaC">Posko C</option>
+                </select>
+            </div>
+            <div class="filter-item">
+                <label><i class="fa-regular fa-biohazard"></i> Tipe risiko</label>
+                <select id="riskTypeFilter">
+                    <option value="all" selected>Semua</option>
+                    <option value="airborne">Airborne</option>
+                    <option value="waterborne">Waterborne</option>
+                    <option value="soil">Soil-based</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- CORE PANELS: 2 grafik pertama (bio aerosol & water) -->
+    <div class="row-grid">
+        <!-- Bioaerosol risk trend -->
+        <div class="chart-card">
+            <div class="chart-title">
+                <i class="fa-regular fa-wind" style="color:#3980b3;"></i> Bioaerosol Risk Trend
+                <span class="tooltip-icon" title="Derived from airborne pathogen signal + humidity pattern">ⓘ</span>
+            </div>
+            <canvas id="bioaerosolChart" width="400" height="160"></canvas>
+            <div class="insight-note" id="bioaerosolInsight">
+                <i class="fa-regular fa-lightbulb"></i> Upward trend detected during night hours (filtered: 24h).
+            </div>
+        </div>
+        <!-- Water contamination index -->
+        <div class="chart-card">
+            <div class="chart-title">
+                <i class="fa-regular fa-droplet" style="color:#3980b3;"></i> Water Contamination Index
+                <span class="tooltip-icon" title="Water risk index aggregated from multiple nodes">ⓘ</span>
+            </div>
+            <canvas id="waterChart" width="400" height="160"></canvas>
+            <div class="insight-note">
+                <i class="fa-regular fa-chart-simple"></i> Coliform & turbidity risk moderate in eastern nodes.
+            </div>
+        </div>
+    </div>
+
+    <!-- Soil risk + AI prediksi -->
+    <div class="soil-ai-row">
+        <!-- Soil microbial risk -->
+        <div class="soil-card">
+            <div class="chart-title"><i class="fa-regular fa-seedling"></i> Soil Microbial Risk</div>
+            <canvas id="soilChart" width="300" height="140"></canvas>
+            <div class="parameter-strip">
+                <div class="param-item"><span class="param-label">Moisture</span><div class="param-value">74%</div></div>
+                <div class="param-item"><span class="param-label">Flood contact</span><div class="param-value">high</div></div>
+                <div class="param-item"><span class="param-label">Pathogen proxy</span><div class="param-value">0.63</div></div>
+            </div>
+            <div><span class="badge-risk"><i class="fa-regular fa-triangle-exclamation"></i> Watch · Alert threshold 70</span></div>
+        </div>
+        <!-- AI predictive panel -->
+        <div class="ai-card">
+            <div class="chart-title"><i class="fa-regular fa-brain"></i> AI Risk Projection (24-72h)</div>
+            <div class="gauge-group">
+                <div class="gauge">
+                    <div class="circle" style="background: conic-gradient(#f4b836 0deg 144deg, #dde5f0 144deg 360deg);"><div class="inner">40%</div></div>
+                    <div class="cat-label">Respiratory</div>
+                </div>
+                <div class="gauge">
+                    <div class="circle" style="background: conic-gradient(#f4b836 0deg 216deg, #dde5f0 216deg 360deg);"><div class="inner">60%</div></div>
+                    <div class="cat-label">Waterborne</div>
+                </div>
+                <div class="gauge">
+                    <div class="circle" style="background: conic-gradient(#f4b836 0deg 108deg, #dde5f0 108deg 360deg);"><div class="inner">30%</div></div>
+                    <div class="cat-label">Vector</div>
+                </div>
+            </div>
+            <div class="text-small" style="margin-top:6px;"><i class="fa-regular fa-clock"></i> Based on historical + current environment</div>
+        </div>
+    </div>
+
+    <!-- AI INSIGHT BOX (STATIC BUT SMART) -->
+    <div class="ai-insight-box">
+        <i class="fa-regular fa-message-exclamation" style="margin-right:14px;"></i> 
+        “Consistent bioaerosol increase + high humidity → elevated respiratory risk in Shelter Zone A.”
+    </div>
+
+    <!-- ZONE COMPARISON VIEW -->
+    <div style="margin-top: 24px;">
+        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px;">
+            <h3 style="color:#174f78;"><i class="fa-regular fa-table"></i> Zone comparison</h3>
+            <span class="badge">klik baris untuk filter grafik (dummy)</span>
+        </div>
+        <div class="zone-table" id="zoneTable">
+            <div class="zone-row zone-header">
+                <div>Zone name</div> <div>Current risk</div> <div>Trend</div> <div>Active alerts</div> <div></div>
+            </div>
+            <div class="zone-row" data-zone="zonaA">
+                <div><i class="fa-regular fa-house-flood"></i> Shelter A</div> <div>68</div> <div class="trend-up">↑ +5%</div> <div><span class="alert-badge">2 alert</span></div> <div><i class="fa-regular fa-arrow-right"></i></div>
+            </div>
+            <div class="zone-row" data-zone="zonaB">
+                <div><i class="fa-regular fa-tent"></i> Shelter B</div> <div>42</div> <div class="trend-down">↓ -2%</div> <div><span class="alert-badge" style="background:#e2eefa; color:#38658b;">0 alert</span></div> <div><i class="fa-regular fa-arrow-right"></i></div>
+            </div>
+            <div class="zone-row" data-zone="zonaC">
+                <div><i class="fa-regular fa-hospital"></i> Posko C</div> <div>81</div> <div class="trend-up">↑ +12%</div> <div><span class="alert-badge">3 alert</span></div> <div><i class="fa-regular fa-arrow-right"></i></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ANALYTICS SETTINGS PANEL (prototype) -->
+    <div class="settings-panel">
+        <div class="toggle-item"><input type="checkbox" id="smoothData" checked> <label for="smoothData">Show smoothed data</label></div>
+        <div class="toggle-item"><input type="checkbox" id="multiZone"> <label for="multiZone">Compare multi‑zones</label></div>
+        <div class="text-small"><i class="fa-regular fa-microchip"></i> Edge AI processed · no raw data</div>
+    </div>
+
+    <div class="footnote">
+        <span><i class="fa-regular fa-circle-check"></i> Data diperbarui otomatis setiap 15 menit</span>
+        <span><i class="fa-regular fa-hard-drive"></i> risk index dari edge AI</span>
+    </div>
+</div>
+
+<!-- chart initialization & filter dummy -->
+ <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+
+<script>
+    (function() {
+        // ----- CHART INIT -----
+        const bioCtx = document.getElementById('bioaerosolChart').getContext('2d');
+        const waterCtx = document.getElementById('waterChart').getContext('2d');
+        const soilCtx = document.getElementById('soilChart').getContext('2d');
+
+        // Bioaerosol chart (line)
+        new Chart(bioCtx, {
+            type: 'line',
+            data: {
+                labels: ['00', '04', '08', '12', '16', '20', '24'],
+                datasets: [{
+                    label: 'Bioaerosol risk',
+                    data: [30, 45, 52, 48, 62, 78, 71],
+                    borderColor: '#3c8dbc',
+                    backgroundColor: '#c2e1f740',
+                    tension: 0.2,
+                    fill: true,
+                    pointBackgroundColor: '#22678c',
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } }
+            }
+        });
+
+        // Water chart (bar)
+        new Chart(waterCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Coliform', 'Turbidity', 'Flood expo'],
+                datasets: [{
+                    label: 'Risk index',
+                    data: [65, 42, 88],
+                    backgroundColor: ['#58a5d6', '#f2b05e', '#8fbcda'],
+                    borderRadius: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } }
+            }
+        });
+
+        // Soil chart (area)
+        new Chart(soilCtx, {
+            type: 'line',
+            data: {
+                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+                datasets: [{
+                    label: 'soil risk',
+                    data: [38, 45, 52, 68, 60, 72],
+                    borderColor: '#5d8c6b',
+                    backgroundColor: '#b8d9c380',
+                    fill: true,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } }
+            }
+        });
+
+        // ----- FILTER UPDATE (dummy change text & insight) -----
+        const timeSelect = document.getElementById('timeFilter');
+        const zoneSelect = document.getElementById('zoneFilter');
+        const riskSelect = document.getElementById('riskTypeFilter');
+        const bioInsight = document.getElementById('bioaerosolInsight');
+
+        function updateInsights() {
+            const time = timeSelect.value;
+            const zone = zoneSelect.value;
+            const risk = riskSelect.value;
+
+            // ubah teks insight berdasarkan filter (dummy)
+            if (time === '24h') bioInsight.innerHTML = '<i class="fa-regular fa-lightbulb"></i> Upward trend detected during night hours (24h view).';
+            else if (time === '7d') bioInsight.innerHTML = '<i class="fa-regular fa-lightbulb"></i> Weekly: bioaerosol spike on days 3–4 (humidity high).';
+            else bioInsight.innerHTML = '<i class="fa-regular fa-lightbulb"></i> 30d trend: gradual increase, wet season pattern.';
+
+            // pesan tambahan jika zona A dipilih
+            if (zone === 'zonaA') bioInsight.innerHTML += ' — Zona A menunjukkan peningkatan ISPA.';
+            else if (zone === 'zonaB') bioInsight.innerHTML += ' — Zona B relatif stabil.';
+            else if (zone === 'zonaC') bioInsight.innerHTML += ' — Zona C risiko air tinggi.';
+
+            // AI insight box juga bisa diupdate (static disini)
+            document.querySelector('.ai-insight-box').innerHTML = 
+                '<i class="fa-regular fa-message-exclamation" style="margin-right:14px;"></i> “' +
+                (risk === 'airborne' ? 'Bioaerosol naik + kelembaban -> potensi ISPA' :
+                 risk === 'waterborne' ? 'Water contamination index naik di hilir' :
+                 'Soil-based pathogen sinyal terdeteksi setelah banjir') +
+                '”';
+        }
+
+        timeSelect.addEventListener('change', updateInsights);
+        zoneSelect.addEventListener('change', updateInsights);
+        riskSelect.addEventListener('change', updateInsights);
+
+        // Zone row click: filter grafik (dummy mengubah insight)
+        const zoneRows = document.querySelectorAll('.zone-row[data-zone]');
+        zoneRows.forEach(row => {
+            row.addEventListener('click', function(e) {
+                const zone = this.getAttribute('data-zone');
+                zoneSelect.value = zone;
+                updateInsights();
+                // highlight baris
+                zoneRows.forEach(r => r.style.background = 'none');
+                this.style.background = '#e2f0fd';
+            });
+        });
+
+        // toggle settings (dummy)
+        document.getElementById('smoothData').addEventListener('change', (e) => {
+            console.log('smoothing toggled', e.target.checked);
+        });
+        document.getElementById('multiZone').addEventListener('change', (e) => {
+            console.log('multi zone compare', e.target.checked);
+        });
+
+        // first call
+        updateInsights();
+    })();
+</script>
+</body>
+</html>

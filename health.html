@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GAIATRI · environmental health overview</title>
+    <!-- Font Awesome 6 (free) -->
+                  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        body {
+            background: #ecf3fa;
+            padding: 24px;
+            min-height: 100vh;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+        }
+
+        .health-container {
+            max-width: 1300px;
+            width: 100%;
+            background: white;
+            border-radius: 48px;
+            box-shadow: 0 40px 70px -20px #1f4460b0;
+            overflow: hidden;
+            padding: 28px 32px 40px 32px;
+        }
+
+        /* header */
+        .page-header {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 28px;
+        }
+        .page-header h1 {
+            font-size: 2.2rem;
+            font-weight: 600;
+            color: #154562;
+        }
+        .subhead {
+            color: #55799e;
+            font-size: 1rem;
+            margin-top: 4px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .badge-nonclinical {
+            background: #fdf0c7;
+            border-radius: 60px;
+            padding: 6px 20px;
+            font-weight: 600;
+            color: #8f6f29;
+            font-size: 0.8rem;
+        }
+
+        /* risk category grid */
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            margin: 32px 0;
+        }
+        .risk-card {
+            background: #f8fcff;
+            border: 1px solid #d2e5f5;
+            border-radius: 32px;
+            padding: 24px;
+            box-shadow: 0 12px 24px -12px #c5daef;
+            cursor: pointer;
+            transition: 0.1s;
+        }
+        .risk-card:hover {
+            background: #f0f8ff;
+            border-color: #a2c6ea;
+        }
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 20px;
+        }
+        .card-icon {
+            width: 58px;
+            height: 58px;
+            background: #d7e9fb;
+            border-radius: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: #1e608b;
+        }
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #144774;
+        }
+        .risk-source {
+            color: #466f95;
+            margin-bottom: 12px;
+            font-weight: 500;
+        }
+        .risk-source span {
+            background: #eaf2fb;
+            padding: 4px 14px;
+            border-radius: 60px;
+            font-size: 0.8rem;
+            margin-right: 8px;
+        }
+        .risk-level {
+            display: inline-block;
+            padding: 6px 24px;
+            border-radius: 60px;
+            font-weight: 700;
+            font-size: 1rem;
+            margin-top: 14px;
+        }
+        .level-high { background: #fbe1d4; color: #bc4c20; }
+        .level-moderate { background: #fff0cf; color: #b47a1e; }
+        .level-low { background: #d3ecdc; color: #2b7848; }
+
+        /* detail panel (hidden awal) */
+        .detail-panel {
+            background: #f7fcff;
+            border-radius: 48px;
+            padding: 32px 36px;
+            margin: 32px 0 28px;
+            border: 2px solid #cfe0f2;
+            box-shadow: 0 20px 30px -10px #b8d0ea;
+        }
+        .detail-header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            margin-bottom: 24px;
+        }
+        .driver-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 24px;
+            background: white;
+            border-radius: 38px;
+            padding: 20px 28px;
+            margin: 20px 0;
+        }
+        .driver-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+            color: #1a4a73;
+        }
+        .ai-narasi {
+            background: #eaf2fd;
+            border-radius: 28px;
+            padding: 24px 30px;
+            border-left: 10px solid #f7b731;
+            font-size: 1.1rem;
+            color: #044267;
+        }
+        .preventive-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px,1fr));
+            gap: 16px;
+            margin: 28px 0;
+        }
+        .prevent-item {
+            background: white;
+            border-radius: 26px;
+            padding: 18px 20px;
+            border: 1px solid #bdd8f0;
+            font-weight: 500;
+        }
+
+        /* health trend sederhana */
+        .trend-container {
+            background: #f8fdfe;
+            border-radius: 38px;
+            padding: 24px 28px;
+            border: 1px solid #c1d9f0;
+            margin: 32px 0;
+        }
+        .trend-bars {
+            display: flex;
+            align-items: end;
+            gap: 20px;
+            height: 140px;
+            margin-top: 24px;
+        }
+        .bar-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+        }
+        .bar {
+            width: 100%;
+            background: #5098cf;
+            border-radius: 16px 16px 6px 6px;
+            height: calc(0.8 * 100px);
+        }
+
+        /* vulnerable group */
+        .vulnerable-section {
+            background: #edf6fe;
+            border-radius: 40px;
+            padding: 24px 30px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            margin: 30px 0;
+        }
+        .group-tag {
+            background: white;
+            border-radius: 60px;
+            padding: 12px 28px;
+            font-weight: 600;
+            color: #1e6190;
+        }
+
+        /* map integration */
+        .map-integrate {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            background: #daeaf9;
+            border-radius: 60px;
+            padding: 16px 32px;
+            cursor: pointer;
+        }
+
+        /* mobile & role */
+        .role-badge {
+            background: #e2edf9;
+            border-radius: 60px;
+            padding: 6px 18px;
+            font-size:0.8rem;
+        }
+
+        /* responsive */
+        @media (max-width: 700px) {
+            .health-container { padding: 16px; }
+            .detail-panel { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+<div class="health-container">
+    <!-- header -->
+    <div class="page-header">
+            <a class="kembali text-decoration-none fw-bold btn rounded-3 px-3 text-light" style="background-color: #0f3f62;" href="index.html"><div>Back</div></a>
+
+        <div>
+            <h1>Environmental Health Overview</h1>
+            <div class="subhead">
+                <span>Population-level health risk indicators based on environmental exposure</span>
+                <span class="badge-nonclinical"><i class="fa-regular fa-eye"></i> Non-clinical | Preventive focus</span>
+            </div>
+        </div>
+        <div class="role-badge"><i class="fa-regular fa-user"></i> Tenaga kesehatan · BPBD</div>
+    </div>
+
+    <!-- 3 kategori risiko (cards) -->
+    <div class="category-grid">
+        <!-- Respiratory card -->
+        <div class="risk-card" data-category="respiratory">
+            <div class="card-header">
+                <div class="card-icon"><i class="fa-regular fa-lungs"></i></div>
+                <span class="card-title">Respiratory risk</span>
+            </div>
+            <div class="risk-source">
+                <span><i class="fa-regular fa-wind"></i> Bioaerosol</span>
+                <span><i class="fa-regular fa-droplet"></i> Humidity</span>
+                <span><i class="fa-regular fa-tent"></i> Ventilation</span>
+            </div>
+            <div class="risk-level level-high">High</div>
+        </div>
+        <!-- Waterborne card -->
+        <div class="risk-card" data-category="waterborne">
+            <div class="card-header">
+                <div class="card-icon"><i class="fa-regular fa-droplet"></i></div>
+                <span class="card-title">Waterborne risk</span>
+            </div>
+            <div class="risk-source">
+                <span><i class="fa-regular fa-flask"></i> Coliform</span>
+                <span><i class="fa-regular fa-water"></i> Flood exposure</span>
+                <span><i class="fa-regular fa-circle-exclamation"></i> Leptospira</span>
+            </div>
+            <div class="risk-level level-moderate">Moderate</div>
+        </div>
+        <!-- Soil-based card -->
+        <div class="risk-card" data-category="soil">
+            <div class="card-header">
+                <div class="card-icon"><i class="fa-regular fa-seedling"></i></div>
+                <span class="card-title">Soil-based risk</span>
+            </div>
+            <div class="risk-source">
+                <span><i class="fa-regular fa-droplet"></i> Moisture</span>
+                <span><i class="fa-regular fa-biohazard"></i> Microbial signal</span>
+                <span><i class="fa-regular fa-bandaid"></i> Wound exposure</span>
+            </div>
+            <div class="risk-level level-low">Low</div>
+        </div>
+    </div>
+
+    <!-- DETAIL PANEL (akan tampil setelah klik) -->
+    <div id="detailPanel" class="detail-panel" style="display: none;">
+        <div class="detail-header">
+            <h2 id="detailTitle" style="color:#154d79;">Respiratory risk</h2>
+            <span class="badge-nonclinical" id="detailLevel">High</span>
+        </div>
+        <!-- environmental drivers -->
+        <div class="driver-list" id="driverList">
+            <span class="driver-item"><i class="fa-regular fa-wind"></i> Bioaerosol ↑ 68%</span>
+            <span class="driver-item"><i class="fa-regular fa-droplet"></i> Humidity ↑ 84%</span>
+            <span class="driver-item"><i class="fa-regular fa-tent"></i> Ventilasi buruk</span>
+        </div>
+        <!-- AI interpretation -->
+        <div class="ai-narasi" id="aiNarasi">
+            <i class="fa-regular fa-brain"></i> “Environmental conditions indicate increased risk of respiratory symptoms in exposed populations.”
+        </div>
+        <!-- preventive recommendations -->
+        <h3 style="color:#1e5984; margin-top:28px;"><i class="fa-regular fa-list-check"></i> Preventive recommendations</h3>
+        <div class="preventive-list" id="preventiveList">
+            <div class="prevent-item"><i class="fa-regular fa-wind"></i> Improve shelter ventilation</div>
+            <div class="prevent-item"><i class="fa-regular fa-mask"></i> Promote mask usage</div>
+            <div class="prevent-item"><i class="fa-regular fa-droplet"></i> Ensure clean water access</div>
+            <div class="prevent-item"><i class="fa-regular fa-hand-holding-heart"></i> Hygiene education</div>
+        </div>
+        <div style="margin-top:20px; font-style:italic; color:#658bb1;">
+            <i class="fa-regular fa-triangle-exclamation"></i> This is not a diagnosis or case count.
+        </div>
+        <button style="margin-top:24px; background:#1a5f8d; color:white; border:none; border-radius:60px; padding:14px 28px;" id="closeDetail">Tutup detail</button>
+    </div>
+
+    <!-- HEALTH TREND sederhana -->
+    <div class="trend-container">
+        <h3 style="color:#154f7a;"><i class="fa-regular fa-chart-line"></i> Health risk trend (7‑hari)</h3>
+        <div class="trend-bars">
+            <div class="bar-item"><div class="bar" style="height:78px;"></div> <span>Sen</span></div>
+            <div class="bar-item"><div class="bar" style="height:82px;"></div> <span>Sel</span></div>
+            <div class="bar-item"><div class="bar" style="height:64px;"></div> <span>Rab</span></div>
+            <div class="bar-item"><div class="bar" style="height:70px;"></div> <span>Kam</span></div>
+            <div class="bar-item"><div class="bar" style="height:88px;"></div> <span>Jum</span></div>
+            <div class="bar-item"><div class="bar" style="height:74px;"></div> <span>Sab</span></div>
+        </div>
+        <div class="text-small" style="color:#6183aa;">Trend of environmental health risk indicators (bukan incidence rate)</div>
+    </div>
+
+    <!-- VULNERABLE GROUP HIGHLIGHT -->
+    <div class="vulnerable-section">
+        <span style="font-weight:700; color:#124971;">Priority groups for prevention:</span>
+        <div style="display:flex; flex-wrap:wrap; gap:10px;">
+            <span class="group-tag"><i class="fa-regular fa-child"></i> Anak-anak</span>
+            <span class="group-tag"><i class="fa-regular fa-person-cane"></i> Lansia</span>
+            <span class="group-tag"><i class="fa-regular fa-pregnant-woman"></i> Ibu hamil</span>
+            <span class="group-tag"><i class="fa-regular fa-vest"></i> Petugas lapangan</span>
+        </div>
+    </div>
+
+    <!-- HEALTH + MAP INTEGRATION -->
+    <div class="map-integrate" onclick="alert('Buka Map View dengan filter penyakit aktif (dummy)')">
+        <i class="fa-regular fa-map-location-dot" style="font-size:1.8rem; color:#1b6898;"></i>
+        <span style="font-weight:600; color:#184c74;">View affected zones on map →</span>
+    </div>
+
+    <!-- MOBILE hint (role & offline) -->
+    <div style="display:flex; justify-content:space-between; margin-top:30px; color:#4f799e; font-size:0.8rem;">
+        <span><i class="fa-regular fa-mobile"></i> Mobile mode: tap kategori → insight ringkas</span>
+        <span><i class="fa-regular fa-hard-drive"></i> Data tersimpan offline</span>
+    </div>
+</div>
+
+<!-- Script untuk interaksi detail -->
+<script>
+    (function() {
+        const detailPanel = document.getElementById('detailPanel');
+        const detailTitle = document.getElementById('detailTitle');
+        const detailLevel = document.getElementById('detailLevel');
+        const driverList = document.getElementById('driverList');
+        const aiNarasi = document.getElementById('aiNarasi');
+        const preventiveList = document.getElementById('preventiveList');
+        const closeBtn = document.getElementById('closeDetail');
+
+        // data konten per kategori
+        const categoryData = {
+            respiratory: {
+                title: 'Respiratory risk',
+                level: 'High',
+                drivers: ['Bioaerosol ↑ 68%', 'Humidity ↑ 84%', 'Ventilasi buruk'],
+                ai: '“Environmental conditions indicate increased risk of respiratory symptoms in exposed populations.”',
+                preventives: ['Improve shelter ventilation', 'Promote mask usage', 'Reduce indoor crowding', 'Hygiene education']
+            },
+            waterborne: {
+                title: 'Waterborne risk',
+                level: 'Moderate',
+                drivers: ['Coliform signal ↑ 42%', 'Flood exposure ↑', 'Leptospira proxy moderate'],
+                ai: '“Elevated water contamination signals suggest increased exposure risk for diarrheal illness.”',
+                preventives: ['Ensure clean water access', 'Sanitasi fasilitas umum', 'Hindari kontak genangan', 'Promote handwashing']
+            },
+            soil: {
+                title: 'Soil-based risk',
+                level: 'Low',
+                drivers: ['Soil moisture 74%', 'Microbial signal stable', 'Luka kontaminasi low'],
+                ai: '“Low soil pathogen activity, but monitor if flooding increases.”',
+                preventives: ['Gunakan alas kaki', 'Bersihkan luka terbuka', 'Hindari kontak tanah basah']
+            }
+        };
+
+        // fungsi untuk update detail
+        function showDetail(category) {
+            const data = categoryData[category];
+            if (!data) return;
+            detailTitle.innerText = data.title;
+            detailLevel.innerText = data.level;
+            detailLevel.className = 'badge-nonclinical'; // reset
+            if (data.level === 'High') detailLevel.classList.add('level-high');
+            else if (data.level === 'Moderate') detailLevel.classList.add('level-moderate');
+            // update drivers
+            driverList.innerHTML = '';
+            data.drivers.forEach(d => {
+                const span = document.createElement('span');
+                span.className = 'driver-item';
+                span.innerHTML = `<i class="fa-regular fa-circle"></i> ${d}`;
+                driverList.appendChild(span);
+            });
+            aiNarasi.innerHTML = `<i class="fa-regular fa-brain"></i> ${data.ai}`;
+            preventiveList.innerHTML = '';
+            data.preventives.forEach(p => {
+                const div = document.createElement('div');
+                div.className = 'prevent-item';
+                div.innerHTML = `<i class="fa-regular fa-check-circle"></i> ${p}`;
+                preventiveList.appendChild(div);
+            });
+            detailPanel.style.display = 'block';
+            window.scrollTo({ top: detailPanel.offsetTop - 20, behavior: 'smooth' });
+        }
+
+        // pasang event listener ke setiap card
+        const cards = document.querySelectorAll('.risk-card');
+        cards.forEach(card => {
+            card.addEventListener('click', (e) => {
+                const cat = card.dataset.category; // respiratory / waterborne / soil
+                showDetail(cat);
+            });
+        });
+
+        // close detail
+        closeBtn.addEventListener('click', () => {
+            detailPanel.style.display = 'none';
+        });
+
+        // jika kategori dari hash (opsional)
+        if (window.location.hash === '#respiratory') showDetail('respiratory');
+    })();
+</script>
+
+<!-- tambahan style untuk level-high dll di badge -->
+<style>
+    .level-high { background: #fbe1d4; color: #bc4c20; }
+    .level-moderate { background: #fff0cf; color: #b47a1e; }
+    .level-low { background: #d3ecdc; color: #2b7848; }
+    .badge-nonclinical.level-high { background: #fbe1d4; color: #bc4c20; }
+    .badge-nonclinical.level-moderate { background: #fff0cf; color: #b47a1e; }
+</style>
+</body>
+</html>

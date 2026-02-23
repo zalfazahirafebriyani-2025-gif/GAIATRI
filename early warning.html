@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GAIATRI · early warning response panel</title>
+    <!-- Font Awesome 6 (free) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        body {
+            background: #eaf1f9;
+            padding: 24px;
+            min-height: 100vh;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+        }
+
+        .early-panel {
+            max-width: 1300px;
+            width: 100%;
+            background: white;
+            border-radius: 48px;
+            box-shadow: 0 40px 70px -20px #1f446070;
+            overflow: hidden;
+            padding: 32px 36px 40px 36px;
+        }
+
+        /* header */
+        .panel-header {
+            margin-bottom: 28px;
+        }
+        .panel-header h1 {
+            font-size: 2.2rem;
+            font-weight: 600;
+            color: #154562;
+            letter-spacing: -0.5px;
+        }
+        .panel-header .sub {
+            color: #517a9f;
+            font-size: 1rem;
+            font-weight: 400;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 4px;
+        }
+
+        /* hero gauge */
+        .gauge-container {
+            background: #f6fbfe;
+            border-radius: 64px;
+            padding: 28px 36px;
+            border: 1px solid #cbe0f0;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 32px;
+            box-shadow: 0 12px 24px -16px #b7d1ea;
+        }
+        .gauge-main {
+            display: flex;
+            align-items: center;
+            gap: 32px;
+            flex-wrap: wrap;
+        }
+        .gauge {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            background: conic-gradient(#e9b441 0deg 230deg, #dbe4f0 230deg 360deg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 8px solid white;
+            box-shadow: 0 10px 30px -5px #aac4e2;
+        }
+        .gauge-inner {
+            width: 130px;
+            height: 130px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .gauge-value {
+            font-size: 3rem;
+            font-weight: 700;
+            line-height: 1;
+            color: #b35f20;
+        }
+        .gauge-label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #254f75;
+            text-transform: uppercase;
+        }
+        .gauge-text h2 {
+            font-size: 2rem;
+            font-weight: 600;
+            color: #1b4a70;
+        }
+        .gauge-text .badge-level {
+            background: #fbe9c4;
+            padding: 6px 22px;
+            border-radius: 60px;
+            font-weight: 700;
+            color: #b16117;
+            font-size: 1.3rem;
+            display: inline-block;
+        }
+        .aggregate-note {
+            color: #688fb3;
+            font-size: 0.9rem;
+            max-width: 300px;
+        }
+
+        /* AI insight box */
+        .insight-card {
+            background: #e3f0fd;
+            border-radius: 42px;
+            padding: 28px 36px;
+            border-left: 14px solid #ffbe5c;
+            margin: 32px 0 28px 0;
+            box-shadow: 0 12px 18px -18px #b5d2f0;
+        }
+        .insight-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        .insight-header i {
+            font-size: 2rem;
+            color: #cc8b1f;
+        }
+        .insight-text {
+            font-size: 1.3rem;
+            font-weight: 500;
+            color: #0b3854;
+            line-height: 1.5;
+            margin-bottom: 18px;
+        }
+        .insight-footer {
+            display: flex;
+            justify-content: space-between;
+            color: #3a6790;
+            font-size: 0.9rem;
+        }
+        .confidence-badge {
+            background: #ffffffb0;
+            padding: 4px 20px;
+            border-radius: 60px;
+            font-weight: 600;
+            border: 1px solid #96bde2;
+        }
+        .disclaimer {
+            font-style: italic;
+            color: #6a8fb1;
+            font-size: 0.8rem;
+        }
+
+        /* main grid: action + zone alert */
+        .action-zone-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 28px;
+            margin: 28px 0 32px;
+        }
+        .action-card {
+            background: #f8fcff;
+            border-radius: 38px;
+            border: 1px solid #c8def2;
+            padding: 24px;
+        }
+        .section-title {
+            font-weight: 700;
+            font-size: 1.3rem;
+            color: #164863;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        /* action list */
+        .action-item {
+            background: white;
+            border-radius: 30px;
+            padding: 22px 24px;
+            margin-bottom: 16px;
+            border: 1px solid #d9e6f5;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 4px 12px #d4e2f3;
+            transition: all 0.1s;
+        }
+        .action-left {
+            display: flex;
+            align-items: center;
+            gap: 22px;
+            flex-wrap: wrap;
+        }
+        .action-icon {
+            width: 56px;
+            height: 56px;
+            background: #eaf2fb;
+            border-radius: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            color: #216794;
+        }
+        .action-content h4 {
+            font-weight: 700;
+            color: #153e5e;
+        }
+        .action-meta {
+            display: flex;
+            gap: 24px;
+            margin-top: 6px;
+            font-size: 0.85rem;
+        }
+        .priority-high { background: #fde4cf; padding: 2px 14px; border-radius: 60px; color: #b04f17; font-weight: 600; }
+        .priority-medium { background: #fff3cf; padding: 2px 14px; border-radius: 60px; color: #997215; }
+        .priority-low { background: #e2edf9; padding: 2px 14px; border-radius: 60px; color: #42678a; }
+        .risk-reduction { color: #397a59; }
+
+        /* zone alert list */
+        .zone-list {
+            background: #f5faff;
+            border-radius: 38px;
+            border: 1px solid #cde0f2;
+            padding: 24px;
+        }
+        .zone-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 0;
+            border-bottom: 1px solid #cde0f0;
+            cursor: pointer;
+        }
+        .zone-item:last-child { border: none; }
+        .zone-name { font-weight: 600; color: #1b4d76; }
+        .alert-badge {
+            background: #fddfc2;
+            border-radius: 60px;
+            padding: 4px 16px;
+            font-weight: 600;
+            color: #b45112;
+        }
+        .badge-watch { background: #fff0c2; color: #916d24; }
+        .badge-safe { background: #d2ebd2; color: #2d7842; }
+
+        /* response log */
+        .log-section {
+            background: #f5faff;
+            border-radius: 34px;
+            padding: 24px 30px;
+            border: 1px solid #cde0f0;
+            margin-top: 30px;
+        }
+        .log-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        .log-entry {
+            display: flex;
+            align-items: center;
+            gap: 28px;
+            padding: 14px 0;
+            border-bottom: 1px solid #d4e5f5;
+        }
+        .log-time { font-weight: 600; color: #2a5e8a; width: 90px; }
+        .log-action { flex: 1; color: #1c3d59; }
+        .log-status { background: #deecf9; border-radius: 60px; padding: 4px 14px; font-size: 0.8rem; }
+
+        /* advanced toggle */
+        .advanced-panel {
+            background: #edf5fe;
+            border-radius: 48px;
+            padding: 22px 30px;
+            margin: 30px 0 10px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 40px;
+        }
+        .toggle-switch {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+        .toggle-switch input[type="checkbox"] {
+            width: 22px;
+            height: 22px;
+            accent-color: #3579a8;
+        }
+        .driver-indicator {
+            display: flex;
+            gap: 24px;
+            color: #1f507b;
+            font-weight: 500;
+        }
+        .driver-indicator span i { margin-right: 6px; }
+
+        /* responsive */
+        @media (max-width: 900px) {
+            .action-zone-row { grid-template-columns: 1fr; }
+            .gauge-container { flex-direction: column; align-items: start; }
+        }
+        @media (max-width: 550px) {
+            .early-panel { padding: 20px; }
+            .gauge { width: 140px; height: 140px; }
+        }
+
+        /* dummy klik */
+        .clickable { cursor: pointer; }
+    </style>
+</head>
+<body>
+<div class="early-panel">
+    <!-- HEADER -->
+    <div class="panel-header">
+        <h1>Early Warning Response</h1>
+        <div class="sub">
+            <i class="fa-regular fa-leaf"></i> Environmental risk–based response recommendation
+            <span class="confidence-badge" style="background:transparent; border:1px solid #a9c8ea;">v.24.02</span>
+        </div>
+    </div>
+
+    <!-- RISK METER HERO -->
+    <div class="gauge-container">
+        <div class="gauge-main">
+            <div class="gauge">
+                <div class="gauge-inner">
+                    <span class="gauge-value">64</span>
+                    <span class="gauge-label">/100</span>
+                </div>
+            </div>
+            <div class="gauge-text">
+                <div class="badge-level">● WATCH (31–55)</div>
+                <h2 style="margin-top: 6px;">Current Environmental Risk: 64 – <span style="color:#ce771c;">WATCH</span></h2>
+            </div>
+        </div>
+        <div class="aggregate-note">
+            <i class="fa-regular fa-circle-info"></i> Aggregated from airborne, water, and soil signals.
+        </div>
+    </div>
+
+    <!-- AI INSIGHT CARD (dinamis via JS) -->
+    <div class="insight-card" id="aiInsightCard">
+        <div class="insight-header">
+            <i class="fa-regular fa-brain"></i>
+            <span class="confidence-badge" id="confidenceBadge">Confidence: High</span>
+        </div>
+        <div class="insight-text" id="insightMessage">
+            “Elevated humidity + increasing bioaerosol signals detected in Shelter Zone A. Pattern historically associated with respiratory outbreaks.”
+        </div>
+        <div class="insight-footer">
+            <span><i class="fa-regular fa-clock"></i> Updated 3 menit lalu</span>
+            <span class="disclaimer"><i class="fa-regular fa-triangle-exclamation"></i> Insight from environmental patterns, not clinical diagnosis</span>
+        </div>
+    </div>
+
+    <!-- ACTION & ZONE GRID -->
+    <div class="action-zone-row">
+        <!-- SUGGESTED ACTIONS LIST -->
+        <div class="action-card">
+            <div class="section-title"><i class="fa-regular fa-list-check"></i> Suggested early response actions</div>
+            <div class="action-item">
+                <div class="action-left">
+                    <div class="action-icon"><i class="fa-regular fa-wind"></i></div>
+                    <div class="action-content">
+                        <h4>Increase ventilation in shelter tents</h4>
+                        <div class="action-meta">
+                            <span class="priority-high">High priority</span>
+                            <span class="risk-reduction"><i class="fa-regular fa-chart-line"></i> Risk reduction: Moderate</span>
+                        </div>
+                    </div>
+                </div>
+                <i class="fa-regular fa-circle-check" style="color:#2b7e4d; font-size:1.6rem;"></i>
+            </div>
+            <div class="action-item">
+                <div class="action-left">
+                    <div class="action-icon"><i class="fa-regular fa-mask"></i></div>
+                    <div class="action-content">
+                        <h4>Distribute masks to high-risk groups</h4>
+                        <div class="action-meta">
+                            <span class="priority-high">High priority</span>
+                            <span class="risk-reduction"><i class="fa-regular fa-chart-line"></i> Risk reduction: High</span>
+                        </div>
+                    </div>
+                </div>
+                <i class="fa-regular fa-circle-check" style="color:#2b7e4d; font-size:1.6rem;"></i>
+            </div>
+            <div class="action-item">
+                <div class="action-left">
+                    <div class="action-icon"><i class="fa-regular fa-droplet"></i></div>
+                    <div class="action-content">
+                        <h4>Inspect water sources near flooding area</h4>
+                        <div class="action-meta">
+                            <span class="priority-medium">Medium priority</span>
+                            <span class="risk-reduction"><i class="fa-regular fa-chart-line"></i> Risk reduction: Moderate</span>
+                        </div>
+                    </div>
+                </div>
+                <i class="fa-regular fa-circle" style="color:#7b9fc5;"></i>
+            </div>
+            <div class="action-item">
+                <div class="action-left">
+                    <div class="action-icon"><i class="fa-regular fa-hand-holding-heart"></i></div>
+                    <div class="action-content">
+                        <h4>Activate hygiene promotion protocol</h4>
+                        <div class="action-meta">
+                            <span class="priority-low">Low priority</span>
+                            <span class="risk-reduction"><i class="fa-regular fa-chart-line"></i> Risk reduction: Low</span>
+                        </div>
+                    </div>
+                </div>
+                <i class="fa-regular fa-circle" style="color:#7b9fc5;"></i>
+            </div>
+        </div>
+
+        <!-- ZONE ALERT LIST (LOCATION-SPECIFIC) -->
+        <div class="zone-list">
+            <div class="section-title" style="margin-bottom: 16px;"><i class="fa-regular fa-location-dot"></i> Affected Zones</div>
+            <div class="zone-item clickable" data-zone="A">
+                <span class="zone-name">Shelter Zone A</span>
+                <span class="alert-badge"><i class="fa-regular fa-bell"></i> Alert</span>
+            </div>
+            <div class="zone-item clickable" data-zone="B">
+                <span class="zone-name">Shelter Zone B</span>
+                <span class="alert-badge badge-watch">Watch</span>
+            </div>
+            <div class="zone-item clickable" data-zone="C">
+                <span class="zone-name">Posko C (hilir)</span>
+                <span class="alert-badge">Alert</span>
+            </div>
+            <div class="zone-item clickable" data-zone="D">
+                <span class="zone-name">Zona D (genangan)</span>
+                <span class="alert-badge badge-watch">Watch</span>
+            </div>
+            <div style="margin-top: 24px; background: #e7f1fc; border-radius: 40px; padding: 12px 18px; font-size:0.9rem;">
+                <i class="fa-regular fa-map"></i> Klik zona → update insight & rekomendasi (dummy)
+            </div>
+        </div>
+    </div>
+
+    <!-- RESPONSE LOG -->
+    <div class="log-section">
+        <div class="log-header">
+            <span class="section-title" style="margin:0;"><i class="fa-regular fa-clock-rotate-left"></i> Response history (prototype)</span>
+            <span class="confidence-badge">last 5 entries</span>
+        </div>
+        <div class="log-entry">
+            <span class="log-time">09:45</span>
+            <span class="log-action">Increase ventilation in shelter tents</span>
+            <span class="log-status">Acknowledged</span>
+        </div>
+        <div class="log-entry">
+            <span class="log-time">08:20</span>
+            <span class="log-action">Distribute masks (Zone A & C)</span>
+            <span class="log-status">Viewed</span>
+        </div>
+        <div class="log-entry">
+            <span class="log-time">06:10</span>
+            <span class="log-action">Inspect water sources near flooding</span>
+            <span class="log-status">Acknowledged</span>
+        </div>
+        <div class="log-entry">
+            <span class="log-time">23 Feb</span>
+            <span class="log-action">Hygiene promotion activated</span>
+            <span class="log-status">Viewed</span>
+        </div>
+    </div>
+
+    <!-- ADVANCED TOGGLE (OPTIONAL) -->
+    <div class="advanced-panel">
+        <div class="toggle-switch">
+            <input type="checkbox" id="envDrivers" checked> 
+            <label for="envDrivers"><i class="fa-regular fa-sliders"></i> Show environmental drivers</label>
+        </div>
+        <div class="toggle-switch">
+            <input type="checkbox" id="compareBaseline"> 
+            <label for="compareBaseline">Compare last 24h vs baseline</label>
+        </div>
+        <div class="driver-indicator" id="driverIndicators">
+            <span><i class="fa-regular fa-droplet" style="color:#2c78b1;"></i> Humidity ↑</span>
+            <span><i class="fa-regular fa-wind" style="color:#ca771d;"></i> Bioaerosol ↑</span>
+            <span><i class="fa-regular fa-water"></i> Water exposure ↑</span>
+        </div>
+    </div>
+    <div style="margin-top: 16px; display: flex; justify-content: flex-end; gap: 16px; color:#607f9e; font-size:0.8rem;">
+        <span><i class="fa-regular fa-circle-check"></i> Semua rekomendasi berbasis indeks risiko lingkungan</span>
+    </div>
+</div>
+
+<!-- JavaScript untuk interaktivitas dummy (update konten berdasarkan klik zone) -->
+<script>
+    (function() {
+        // Ambil elemen yang akan di-update
+        const insightMessage = document.getElementById('insightMessage');
+        const confidenceBadge = document.getElementById('confidenceBadge');
+        const actionItems = document.querySelectorAll('.action-item'); // hanya untuk demo kita ubah teks parsial
+        const zoneRows = document.querySelectorAll('.zone-item.clickable');
+        const driverSpan = document.getElementById('driverIndicators');
+
+        // Fungsi untuk update konten berdasarkan zona (dummy)
+        function updatePanelForZone(zoneId) {
+            if (zoneId === 'A') {
+                insightMessage.innerText = '“Elevated humidity + increasing bioaerosol signals detected in Shelter Zone A. Pattern historically associated with respiratory outbreaks.”';
+                confidenceBadge.innerText = 'Confidence: High';
+                // ubah sedikit action pertama sebagai contoh
+                document.querySelectorAll('.action-item h4')[0].innerText = 'Increase ventilation in Zone A tents (urgent)';
+                document.querySelectorAll('.priority-high')[0].innerText = 'High priority';
+                if (driverSpan) driverSpan.innerHTML = '<span><i class="fa-regular fa-droplet"></i> Humidity ↑ 78%</span> <span><i class="fa-regular fa-wind"></i> Bioaerosol ↑ 64</span> <span><i class="fa-regular fa-water"></i> Water exposure →</span>';
+            } else if (zoneId === 'B') {
+                insightMessage.innerText = '“Zone B: water turbidity signals moderate, coliform risk stable. Watch level maintained.”';
+                confidenceBadge.innerText = 'Confidence: Medium';
+                document.querySelectorAll('.action-item h4')[0].innerText = 'Monitor water points in Zone B';
+                document.querySelectorAll('.priority-high')[0].innerText = 'Medium priority';
+                if (driverSpan) driverSpan.innerHTML = '<span><i class="fa-regular fa-droplet"></i> Humidity → 62%</span> <span><i class="fa-regular fa-wind"></i> Bioaerosol → 38</span> <span><i class="fa-regular fa-water"></i> Turbidity ↑</span>';
+            } else if (zoneId === 'C') {
+                insightMessage.innerText = '“Posko C (hilir): water contamination signal elevated after flood exposure. Potential waterborne risk.”';
+                confidenceBadge.innerText = 'Confidence: High';
+                document.querySelectorAll('.action-item h4')[2].innerText = 'Immediate inspection of water sources - Posko C';
+                document.querySelectorAll('.priority-medium')[0].innerText = 'High priority';
+                if (driverSpan) driverSpan.innerHTML = '<span><i class="fa-regular fa-droplet"></i> Humidity 81%</span> <span><i class="fa-regular fa-wind"></i> Bioaerosol ↑ 45</span> <span><i class="fa-regular fa-water"></i> Flood expo ↑↑</span>';
+            } else {
+                // fallback (D)
+                insightMessage.innerText = '“Zone D: stagnant water, soil signal increasing. Watch for vector-related risk.”';
+                confidenceBadge.innerText = 'Confidence: Medium';
+                document.querySelectorAll('.action-item h4')[3].innerText = 'Activate vector control around Zone D';
+                if (driverSpan) driverSpan.innerHTML = '<span><i class="fa-regular fa-droplet"></i> Humidity 68%</span> <span><i class="fa-regular fa-wind"></i> Bioaerosol stable</span> <span><i class="fa-regular fa-water"></i> Standing water ↑</span>';
+            }
+        }
+
+        // tambahkan event listener ke setiap zona
+        zoneRows.forEach(row => {
+            row.addEventListener('click', function(e) {
+                const zone = this.getAttribute('data-zone') || 'A';
+                updatePanelForZone(zone);
+                // highlight baris yang diklik (opsional)
+                zoneRows.forEach(r => r.style.background = 'none');
+                this.style.background = '#e4f0fd';
+            });
+        });
+
+        // toggle checkboxes (dummy console, no error)
+        const chk1 = document.getElementById('envDrivers');
+        const chk2 = document.getElementById('compareBaseline');
+        const driversDiv = document.getElementById('driverIndicators');
+        chk1.addEventListener('change', (e) => {
+            driversDiv.style.opacity = e.target.checked ? '1' : '0.3';
+        });
+        chk2.addEventListener('change', (e) => {
+            if (e.target.checked) {
+                // contoh update insight sedikit
+                insightMessage.innerText = '“Compared to baseline: bioaerosol +18%, humidity +9% → increased risk.”';
+            } else {
+                updatePanelForZone('A'); // kembali default
+            }
+        });
+
+        // default active highlight (Zone A)
+        updatePanelForZone('A');
+        document.querySelector('[data-zone="A"]').style.background = '#e4f0fd';
+    })();
+</script>
+</body>
+</html>
